@@ -2,6 +2,7 @@ import 'package:alice/alice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:food_express/provider/login_provider.dart';
+import 'package:food_express/provider/main_provider.dart';
 import 'package:food_express/screen/splash/splash_page.dart';
 import 'package:food_express/utils/app_colors.dart';
 import 'package:food_express/utils/pref_utils.dart';
@@ -32,6 +33,7 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LoginProvider()),
+        ChangeNotifierProvider(create: (context) => MainProvider()),
       ],
       child: MaterialApp(
         title: 'Food Express',

@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:food_express/models/restuarant_model.dart';
+import 'package:food_express/provider/main_provider.dart';
+import 'package:food_express/utils/pref_utils.dart';
+import 'package:provider/provider.dart';
 
 import '../../../generated/assets.dart';
 import '../../../models/offer_model.dart';
@@ -24,6 +27,7 @@ class RestuarantDetail extends StatefulWidget {
 class _RestuarantDetailState extends State<RestuarantDetail> {
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<MainProvider>(context);
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -72,22 +76,20 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                         height: 200,
                         imageUrl: "$BASE_IMAGE_URL${widget.restuarant.main_image}",
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                        const Center(
+                        placeholder: (context, url) => const Center(
                             child: SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
                                   color: Colors.grey,
                                 ))),
-                        errorWidget: (context, url, error) =>
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                    color: Colors.grey.shade50,
-                                    child: Image.asset(
-                                      Assets.imagesDefaultImg,
-                                    ))),
+                        errorWidget: (context, url, error) => ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                                color: Colors.grey.shade50,
+                                child: Image.asset(
+                                  Assets.imagesDefaultImg,
+                                ))),
                       ),
                     ),
                     Container(
@@ -153,7 +155,7 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style:
-                            TextStyle(color: AppColors.TEXT_COLOR, fontFamily: "regular", fontSize: 18),
+                                TextStyle(color: AppColors.TEXT_COLOR, fontFamily: "regular", fontSize: 18),
                           ),
                         ],
                       ),
@@ -252,7 +254,9 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                         print(rating);
                       },
                     ),
-                    const SizedBox(width: 4,),
+                    const SizedBox(
+                      width: 4,
+                    ),
                     Text(
                       widget.restuarant.rating.toStringAsFixed(1),
                       textAlign: TextAlign.start,
@@ -313,7 +317,7 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
               SizedBox(
                 height: 21,
                 child: ListView.builder(
-                  padding: EdgeInsets.only(left: 20),
+                    padding: const EdgeInsets.only(left: 20),
                     shrinkWrap: true,
                     primary: false,
                     scrollDirection: Axis.horizontal,
@@ -321,35 +325,72 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                     itemBuilder: (context, index) {
                       var item = widget.categoryList[index];
                       return InkWell(
+                        onTap: () {
+                          provider.setActivCat(widget.categoryList, item.id);
+                        },
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(item.title ?? "Category", style: TextStyle(color: AppColors.TEXT_COLOR,
-                                fontFamily: "regular",
-                                fontSize: 20),),
+                            Text(
+                              item.title ?? "Category",
+                              style: TextStyle(
+                                  color: (item.active) ? AppColors.ICON_COLOR : AppColors.TEXT_COLOR,
+                                  fontFamily: "regular",
+                                  fontSize: 20),
+                            ),
                             Container(
                               margin: const EdgeInsets.symmetric(horizontal: 8),
-                              width: 1, height: 21, color: AppColors.TEXT_COLOR,)
+                              width: 1,
+                              height: 21,
+                              color: AppColors.ICON_COLOR,
+                            )
                           ],
                         ),
                       );
                     }),
               ),
-              GridView.builder(
-                  primary: false,
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.only(left: 20, right: 20, top: 18),
-                  itemCount: widget.restuarant.product_list?.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisSpacing: 20, // horizontal
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.67,
-                      mainAxisSpacing: 20 // vertical
+              Consumer<MainProvider>(
+                builder: (context, value, child) {
+                  return GridView.builder(
+                      primary: false,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 18,
+                      ),
+                      itemCount: value.getProductsByCat(widget.restuarant.product_list ?? []).length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisSpacing: 20, // horizontal
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.582,
+                          mainAxisSpacing: 20 // vertical
+                          ),
+                      itemBuilder: (_, index) {
+                        var foodItem = value.getProductsByCat(widget.restuarant.product_list ?? [])[index];
+                        return FoodItemView(foodItem: foodItem);
+                      });
+                },
+              ),
+              Container(
+                height: 50,
+                margin: EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 8),
+                decoration: BoxDecoration(gradient: buttonGradiet(), borderRadius: BorderRadius.circular(12)),
+                child: const Center(
+                  child: Text(
+                    "Order",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  itemBuilder: (_, index) {
-                    var foodItem = (widget.restuarant.product_list??[])[index];
-                    return FoodItemView(foodItem: foodItem);
-                  }),
+                ),
+              ),
+              Container(
+                alignment: Alignment.center,
+                child: Text(
+                  "Click order to go to the shopping cart",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppColors.TEXT_COLOR, fontSize: 15),
+                ),
+              )
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:food_express/api/api_services.dart';
 import 'package:food_express/models/restuarant_model.dart';
+import 'package:food_express/utils/pref_utils.dart';
 import 'package:stacked/stacked.dart';
 import '../models/offer_model.dart';
 
@@ -43,7 +44,9 @@ class MainViewModel extends BaseViewModel {
     isProgress = true;
     notifyListeners();
     final data = await api.categories(_errorStream);
+    data?[0].active = true;
     categoryList = data ?? [];
+    PrefUtils.setActCat(data?[0].id??0);
     isProgress = false;
     notifyListeners();
   }

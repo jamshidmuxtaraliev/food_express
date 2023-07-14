@@ -6,6 +6,8 @@ class OfferModel{
   final int id;
   final String? title;
   final String? image;
+  @JsonKey(ignore: true)
+  bool active = false;
   OfferModel(this.id, this.title, this.image);
 
   factory OfferModel.fromJson(Map<String, dynamic> json) => _$OfferModelFromJson(json);
