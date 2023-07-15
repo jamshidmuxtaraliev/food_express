@@ -15,6 +15,11 @@ class MainViewModel extends BaseViewModel {
     return _errorStream.stream;
   }
 
+  StreamController<bool> _makeRatingData = StreamController();
+  Stream<bool> get makeRatingData{
+    return _makeRatingData.stream;
+  }
+
   List<OfferModel> offerList = [];
   List<OfferModel> categoryList = [];
   List<RestuarantModel> nearRestuarants = [];
@@ -87,6 +92,19 @@ class MainViewModel extends BaseViewModel {
     final data = await api.topRestuarants(region_id, district_id, category_id, food_id, keyword, sort, limit,
         latitude, longitude, _errorStream);
     topRestuarants = data ?? [];
+    isProgress = false;
+    notifyListeners();
+  }
+
+  void makeRatingRestaurant(
+      int restaurant_id,
+      double rating,
+      String comment,
+  ) async {
+    isProgress = true;
+    notifyListeners();
+    final data = await api.makeRatingRestaurant(restaurant_id, rating, comment, _errorStream);
+    _makeRatingData.sink.add(data??false);
     isProgress = false;
     notifyListeners();
   }

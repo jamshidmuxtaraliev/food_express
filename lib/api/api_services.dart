@@ -7,6 +7,7 @@ import 'package:food_express/main.dart';
 import 'package:food_express/models/base_model.dart';
 import 'package:food_express/models/restuarant_model.dart';
 import 'package:food_express/utils/constants.dart';
+import 'package:food_express/utils/pref_utils.dart';
 
 import '../models/offer_model.dart';
 import '../models/response/register_response_model.dart';
@@ -20,7 +21,7 @@ class ApiServices {
       'Key': DEVELOPER_KEY,
       'Content-Type': 'application/json',
       // 'token': PrefUtils.getToken(),
-      'token': '',
+      'Token': PrefUtils.getToken(),
       'Connection': "close",
     });
     dio.interceptors.add(MyApp.alice.getDioInterceptor());
@@ -220,5 +221,31 @@ class ApiServices {
       errorStream.sink.add(e.toString());
     }
     return [];
+  }
+
+
+
+  Future<bool?> makeRatingRestaurant(
+      int restaurant_id,
+      double rating,
+      String comment,
+      StreamController<String> errorStream) async {
+    try {
+      final response = await dio.post("make_rating",
+          data: jsonEncode({
+            'restaurant_id': restaurant_id,
+            'rating':rating,
+            'comment':comment
+          }));
+      final baseData = wrapResponse(response);
+      if (baseData.success) {
+        return true;
+      } else {
+        errorStream.sink.add(baseData.message);
+      }
+    } on DioException catch (e) {
+      errorStream.sink.add(e.toString());
+    }
+    return null;
   }
 }
