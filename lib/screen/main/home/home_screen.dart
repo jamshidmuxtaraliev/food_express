@@ -53,12 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // @override
-  // void initState() {
-  // _getCurrentPosition();
-  //   super.initState();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder.reactive(
@@ -70,198 +64,234 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Container(
               color: AppColors.TRANSPARENT,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 20),
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            Assets.imagesLocation,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                        child: Image.asset(
+                          Assets.imagesMenu,
+                          width: 30,
+                          height: 30,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Image.asset(
+                        Assets.imagesLogo,
+                        width: 120,
+                        height: 40,
+                      ),
+                      InkWell(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+                          child: Image.asset(
+                            Assets.imagesProfile,
+                            color: Colors.white,
                             width: 22,
                             height: 22,
                           ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Text(
-                            "Fergana",
-                            style: TextStyle(color: Colors.white, fontFamily: "semibold", fontSize: 24),
-                          )
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    CarouselSlider(
-                      options: CarouselOptions(
-                        autoPlay: true,
-                        aspectRatio: 2.0,
-                        enlargeCenterPage: true,
-                      ),
-                      items: viewModel.offerList
-                          .map((item) => InkWell(
-                                onTap: () {
-                                  print(item.id);
-                                },
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      width: MediaQuery.of(context).size.width,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(16),
-                                          border: Border.all(
-                                              color: AppColors.GREY, width: 1, style: BorderStyle.solid),
-                                          gradient: LinearGradient(
-                                              colors: [Colors.black.withOpacity(0.3), Colors.white],
-                                              begin: Alignment.bottomCenter,
-                                              end: Alignment.topCenter),
-                                          image: DecorationImage(
-                                            image: NetworkImage("$BASE_IMAGE_URL${item.image}"),
-                                            fit: BoxFit.fill,
-                                          )),
-                                    ),
-                                    Container(
-                                      alignment: Alignment.bottomLeft,
-                                      width: MediaQuery.of(context).size.width,
-                                      height: 200,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        gradient: LinearGradient(
-                                            colors: [Colors.black.withOpacity(0.4), Colors.transparent],
-                                            begin: Alignment.bottomCenter,
-                                            end: Alignment.topCenter),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(bottom: 16.0, left: 16, right: 8),
-                                        child: Text(
-                                          item.title ?? "Top Maxsulot",
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20.0, top: 20),
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  Assets.imagesLocation,
+                                  width: 22,
+                                  height: 22,
                                 ),
-                              ))
-                          .toList(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
-                      child: Row(
-                        children: [
-                          const Text(
-                            "Category",
-                            style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
-                          ),
-                          Expanded(child: Container()),
-                          Row(
-                            children: [
-                              const Text(
-                                "View all",
-                                style: TextStyle(color: Colors.white, fontFamily: "regular", fontSize: 22),
-                              ),
-                              Image.asset(
-                                Assets.imagesArrowRight,
-                                width: 24,
-                                height: 24,
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 146,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(left: 20),
-                        itemCount: viewModel.categoryList.length,
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        primary: false,
-                        itemBuilder: (context, index) {
-                          var item = viewModel.categoryList[index];
-                          return CategoryItemView(
-                            item: item,
-                          );
-                        },
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
-                      child: Text(
-                        "Nearby restuarants",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 240,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(left: 20),
-                        itemCount: viewModel.nearRestuarants.length,
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        primary: false,
-                        itemBuilder: (context, index) {
-                          var item = viewModel.nearRestuarants[index];
-                          return NearRestuarantItemView(
-                            item: item,
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
-                      child: Row(
-                        children: [
-                          Image.asset(Assets.imagesAward),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          const Text(
-                            "Top restaurants",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 295,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.only(left: 20),
-                        itemCount: viewModel.topRestuarants.length,
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        primary: false,
-                        itemBuilder: (context, index) {
-                          var item = viewModel.topRestuarants[index];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RestuarantDetail(
-                                            restuarant: item, categoryList: viewModel.categoryList,
-                                          )));
-                            },
-                            child: RestuarantItemView(
-                              item: item,
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                const Text(
+                                  "Fergana",
+                                  style: TextStyle(color: Colors.white, fontFamily: "semibold", fontSize: 24),
+                                )
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              autoPlay: true,
+                              aspectRatio: 2.0,
+                              enlargeCenterPage: true,
+                            ),
+                            items: viewModel.offerList
+                                .map((item) => InkWell(
+                                      onTap: () {
+                                        print(item.id);
+                                      },
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context).size.width,
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(16),
+                                                border: Border.all(
+                                                    color: AppColors.GREY, width: 1, style: BorderStyle.solid),
+                                                gradient: LinearGradient(
+                                                    colors: [Colors.black.withOpacity(0.3), Colors.white],
+                                                    begin: Alignment.bottomCenter,
+                                                    end: Alignment.topCenter),
+                                                image: DecorationImage(
+                                                  image: NetworkImage("$BASE_IMAGE_URL${item.image}"),
+                                                  fit: BoxFit.fill,
+                                                )),
+                                          ),
+                                          Container(
+                                            alignment: Alignment.bottomLeft,
+                                            width: MediaQuery.of(context).size.width,
+                                            height: 200,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(16),
+                                              gradient: LinearGradient(
+                                                  colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+                                                  begin: Alignment.bottomCenter,
+                                                  end: Alignment.topCenter),
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(bottom: 16.0, left: 16, right: 8),
+                                              child: Text(
+                                                item.title ?? "Top Maxsulot",
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "Category",
+                                  style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
+                                ),
+                                Expanded(child: Container()),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "View all",
+                                      style: TextStyle(color: Colors.white, fontFamily: "regular", fontSize: 22),
+                                    ),
+                                    Image.asset(
+                                      Assets.imagesArrowRight,
+                                      width: 24,
+                                      height: 24,
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 146,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.only(left: 20),
+                              itemCount: viewModel.categoryList.length,
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              primary: false,
+                              itemBuilder: (context, index) {
+                                var item = viewModel.categoryList[index];
+                                return CategoryItemView(
+                                  item: item,
+                                );
+                              },
+                            ),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
+                            child: Text(
+                              "Nearby restuarants",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 240,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.only(left: 20),
+                              itemCount: viewModel.nearRestuarants.length,
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              primary: false,
+                              itemBuilder: (context, index) {
+                                var item = viewModel.nearRestuarants[index];
+                                return NearRestuarantItemView(
+                                  item: item,
+                                );
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20.0, right: 20, top: 30, bottom: 12),
+                            child: Row(
+                              children: [
+                                Image.asset(Assets.imagesAward),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                const Text(
+                                  "Top restaurants",
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(color: Colors.white, fontFamily: "bold", fontSize: 24),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 295,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.only(left: 20),
+                              itemCount: viewModel.topRestuarants.length,
+                              scrollDirection: Axis.horizontal,
+                              shrinkWrap: true,
+                              primary: false,
+                              itemBuilder: (context, index) {
+                                var item = viewModel.topRestuarants[index];
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => RestuarantDetail(
+                                                  restuarant: item, categoryList: viewModel.categoryList,
+                                                )));
+                                  },
+                                  child: RestuarantItemView(
+                                    item: item,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             if (viewModel.isProgress) showMyProgress()

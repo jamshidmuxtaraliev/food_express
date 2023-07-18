@@ -46,6 +46,8 @@ dependencies:
   carousel_slider:
   fluttertoast:
   flutter_rating_bar:
+  url_launcher:
+  otp_text_field:
 
 
   # The following adds the Cupertino Icons font to your application.

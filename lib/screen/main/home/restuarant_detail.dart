@@ -5,17 +5,16 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:food_express/api/main_viewmodel.dart';
 import 'package:food_express/models/restuarant_model.dart';
 import 'package:food_express/provider/main_provider.dart';
-import 'package:food_express/utils/pref_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:stacked/stacked.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../../../generated/assets.dart';
 import '../../../models/offer_model.dart';
-import '../../../models/product_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/constants.dart';
 import '../../../utils/utils.dart';
 import '../../../view/food_item_view.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLaunch;
 
 class RestuarantDetail extends StatefulWidget {
   RestuarantModel restuarant;
@@ -171,8 +170,14 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                           ),
                         ),
                         InkWell(
-                          onTap: () {
-                            //google Map ga otish
+                          onTap: () async {
+                            String googleUrl =
+                                'https://www.google.com/maps/search/?api=1&query=${widget.restuarant.latitude},${widget.restuarant.longitude}';
+                            if (await canLaunch(googleUrl)) {
+                              await launch(googleUrl);
+                            } else {
+                              throw 'Could not open the map.';
+                            }
                           },
                           child: Text(
                             "Open the Map",
@@ -296,11 +301,12 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                                         builder: (context, scrollController) {
                                           double? rating;
                                           return Container(
-                                            padding:
-                                            const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 20),
+                                            padding: const EdgeInsets.only(
+                                                top: 16, left: 20, right: 20, bottom: 20),
                                             decoration: BoxDecoration(
                                                 borderRadius: const BorderRadius.only(
-                                                    topRight: Radius.circular(15), topLeft: Radius.circular(15)),
+                                                    topRight: Radius.circular(15),
+                                                    topLeft: Radius.circular(15)),
                                                 gradient: backgroundGradiet()),
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,7 +374,8 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                                                   decoration: BoxDecoration(
                                                       border: Border.all(
                                                           width: 0.5, color: AppColors.TEXTFILED_COLOR),
-                                                      borderRadius: const BorderRadius.all(Radius.circular(15))),
+                                                      borderRadius:
+                                                          const BorderRadius.all(Radius.circular(15))),
                                                   alignment: Alignment.center,
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -406,7 +413,8 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                                                             color: Color(0xFF535353),
                                                           ),
                                                         ),
-                                                        itemPadding: const EdgeInsets.symmetric(horizontal: 2.0),
+                                                        itemPadding:
+                                                            const EdgeInsets.symmetric(horizontal: 2.0),
                                                         onRatingUpdate: (value) {
                                                           rating = value;
                                                           print(value);
@@ -417,36 +425,39 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                                                 ),
                                                 (viewModel.isProgress)
                                                     ? Container(
-                                                  height: 50,
-                                                  margin: const EdgeInsets.only(top: 16),
-                                                  decoration: BoxDecoration(
-                                                      gradient: buttonGradiet(),
-                                                      borderRadius: BorderRadius.circular(12)),
-                                                  child: const Center(
-                                                    child: CircularProgressIndicator(),
-                                                  ),
-                                                )
+                                                        height: 50,
+                                                        margin: const EdgeInsets.only(top: 16),
+                                                        decoration: BoxDecoration(
+                                                            gradient: buttonGradiet(),
+                                                            borderRadius: BorderRadius.circular(12)),
+                                                        child: const Center(
+                                                          child: CircularProgressIndicator(),
+                                                        ),
+                                                      )
                                                     : InkWell(
-                                                  onTap: () {
-                                                    setSTate(){
-                                                      viewModel.makeRatingRestaurant(widget.restuarant.id,
-                                                          rating ?? 0, commentController.text ?? "");
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    height: 50,
-                                                    margin: const EdgeInsets.only(top: 16),
-                                                    decoration: BoxDecoration(
-                                                        gradient: buttonGradiet(),
-                                                        borderRadius: BorderRadius.circular(12)),
-                                                    child: const Center(
-                                                      child: Text(
-                                                        "Leave a review",
-                                                        style: TextStyle(color: Colors.white, fontSize: 20),
+                                                        onTap: () {
+                                                          setSTate() {
+                                                            viewModel.makeRatingRestaurant(
+                                                                widget.restuarant.id,
+                                                                rating ?? 0,
+                                                                commentController.text ?? "");
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          height: 50,
+                                                          margin: const EdgeInsets.only(top: 16),
+                                                          decoration: BoxDecoration(
+                                                              gradient: buttonGradiet(),
+                                                              borderRadius: BorderRadius.circular(12)),
+                                                          child: const Center(
+                                                            child: Text(
+                                                              "Leave a review",
+                                                              style: TextStyle(
+                                                                  color: Colors.white, fontSize: 20),
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                           );
@@ -479,25 +490,30 @@ class _RestuarantDetailState extends State<RestuarantDetail> {
                       style: TextStyle(color: Colors.white, fontFamily: "medium", fontSize: 20),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          Assets.imagesCall,
-                          width: 24,
-                          height: 24,
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child: Text(
-                            widget.restuarant.phone,
-                            style: TextStyle(color: AppColors.WHITE, fontFamily: "medium", fontSize: 22),
+                  InkWell(
+                    onTap: () {
+                      UrlLaunch.launch("tel:${widget.restuarant.phone}");
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            Assets.imagesCall,
+                            width: 24,
+                            height: 24,
                           ),
-                        ),
-                      ],
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: Text(
+                              widget.restuarant.phone,
+                              style: TextStyle(color: AppColors.WHITE, fontFamily: "medium", fontSize: 22),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Container(

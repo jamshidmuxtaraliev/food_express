@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:food_express/generated/assets.dart';
 import 'package:food_express/models/bottom_navigation_model.dart';
 import 'package:food_express/screen/main/cart/cart_screen.dart';
@@ -31,85 +32,63 @@ class _MainScreenState extends State<MainScreen> {
       width: double.infinity,
       height: double.infinity,
       decoration: BoxDecoration(gradient: backgroundGradiet()),
-      child: Scaffold(
-        backgroundColor: AppColors.TRANSPARENT,
-        appBar: AppBar(
+      child: SafeArea(
+        child: Scaffold(
           backgroundColor: AppColors.TRANSPARENT,
-          elevation: 0,
-          title: Image.asset(
-            Assets.imagesLogo,
-            width: 120,
-            height: 40,
-          ),
-          centerTitle: true,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Image.asset(
-              Assets.imagesMenu,
-              width: 30,
-              height: 30,
-              color: Colors.white,
-            ),
-          ),
-          leadingWidth: 52,
-          actions: [
-            InkWell(
-              child: Image.asset(
-                Assets.imagesProfile,
-                color: Colors.white,
-                width: 22,
-                height: 22,
-              ),
-            ),
-            const SizedBox(
-              width: 20,
-            )
-          ],
+          body: screenList[currentPage],
+          bottomNavigationBar: BottomNavigationBar(
+              backgroundColor: AppColors.TRANSPARENT,
+              elevation: 0,
+              iconSize: 24,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              selectedIconTheme: IconThemeData(color: AppColors.ICON_COLOR),
+              selectedItemColor: AppColors.ICON_COLOR,
+              selectedLabelStyle: TextStyle(color: AppColors.ICON_COLOR),
+              unselectedIconTheme: IconThemeData(color: AppColors.TEXTFILED_COLOR2),
+              unselectedItemColor: AppColors.TEXTFILED_COLOR2,
+              onTap: (index) {
+                setState(() {
+                  if (index == 3) {
+                    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                      statusBarColor: AppColors.ICON_COLOR_LIGHT,
+                    ));
+                  }else{
+                    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                      statusBarColor: AppColors.LIGHT_GREY,
+                    ));
+                  }
+                  currentPage = index;
+                });
+              },
+              currentIndex: currentPage,
+              items: [
+                BottomNavigationBarItem(
+                    icon: const ImageIcon(
+                      AssetImage(Assets.imagesHome),
+                    ),
+                    label: "Main",
+                    backgroundColor: AppColors.TRANSPARENT),
+                BottomNavigationBarItem(
+                    icon: const ImageIcon(
+                      AssetImage(Assets.imagesMap),
+                    ),
+                    label: "Map",
+                    backgroundColor: AppColors.TRANSPARENT),
+                BottomNavigationBarItem(
+                    icon: const ImageIcon(
+                      AssetImage(Assets.imagesCart),
+                    ),
+                    label: "Cart",
+                    backgroundColor: AppColors.TRANSPARENT),
+                BottomNavigationBarItem(
+                    icon: const ImageIcon(
+                      AssetImage(Assets.imagesProfile,),
+                    ),
+                    label: "Profile",
+                    backgroundColor: AppColors.TRANSPARENT),
+              ]),
         ),
-        body: screenList[currentPage],
-        bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: AppColors.TRANSPARENT,
-            elevation: 0,
-            iconSize: 24,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            selectedIconTheme: IconThemeData(color: AppColors.ICON_COLOR),
-            selectedItemColor: AppColors.ICON_COLOR,
-            selectedLabelStyle: TextStyle(color: AppColors.ICON_COLOR),
-            unselectedIconTheme: IconThemeData(color: AppColors.TEXTFILED_COLOR2),
-            unselectedItemColor: AppColors.TEXTFILED_COLOR2,
-            onTap: (index) {
-              setState(() {
-                currentPage = index;
-              });
-            },
-            currentIndex: currentPage,
-            items: [
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(
-                    AssetImage(Assets.imagesHome),
-                  ),
-                  label: "Main",
-                  backgroundColor: AppColors.TRANSPARENT),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(
-                    AssetImage(Assets.imagesMap),
-                  ),
-                  label: "Map",
-                  backgroundColor: AppColors.TRANSPARENT),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(
-                    AssetImage(Assets.imagesCart),
-                  ),
-                  label: "Cart",
-                  backgroundColor: AppColors.TRANSPARENT),
-              BottomNavigationBarItem(
-                  icon: const ImageIcon(
-                    AssetImage(Assets.imagesProfile,),
-                  ),
-                  label: "Profile",
-                  backgroundColor: AppColors.TRANSPARENT),
-            ]),
       ),
     );
   }

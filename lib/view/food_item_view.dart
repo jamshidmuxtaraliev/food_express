@@ -21,7 +21,6 @@ class FoodItemView extends StatefulWidget {
 class _FoodItemViewState extends State<FoodItemView> {
   @override
   Widget build(BuildContext context) {
-    print("aaaaaaaaaaaaaaaaaaaaaa");
     return Consumer<MainProvider>(
 
       builder: (context, provider, child) {
