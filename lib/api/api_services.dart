@@ -106,6 +106,27 @@ class ApiServices {
     return null;
   }
 
+  Future<RegisterResponseModel?> resetPassword(
+      String old_password, String new_password, int sms_code, StreamController<String> errorStream) async {
+    try {
+      final response = await dio.post("reset_password",
+          data: jsonEncode({
+            'old_password': old_password,
+            'new_password': new_password,
+            'sms_code': sms_code,
+          }));
+      final baseData = wrapResponse(response);
+      if (baseData.success) {
+        return RegisterResponseModel.fromJson(baseData.data);
+      } else {
+        errorStream.sink.add(baseData.message);
+      }
+    } on DioException catch (e) {
+      errorStream.sink.add(e.toString());
+    }
+    return null;
+  }
+
   Future<List<OfferModel>?> offers(StreamController<String> errorStream) async {
     try {
       final response = await dio.get("offers");
@@ -248,4 +269,5 @@ class ApiServices {
     }
     return null;
   }
+
 }

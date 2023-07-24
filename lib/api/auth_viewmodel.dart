@@ -30,6 +30,7 @@ class AuthViewModel extends BaseViewModel {
     notifyListeners();
     if (data != null) {
       PrefUtils.setToken(data.token);
+      PrefUtils.setUserData(data);
       _registerStream.sink.add(data);
     }
   }
@@ -42,6 +43,7 @@ class AuthViewModel extends BaseViewModel {
     notifyListeners();
     if (data != null) {
       PrefUtils.setToken(data.token);
+      PrefUtils.setUserData(data);
       _registerStream.sink.add(data);
     }
   }

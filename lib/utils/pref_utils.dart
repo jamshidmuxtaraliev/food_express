@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:food_express/models/response/register_response_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/cart_model.dart';
@@ -9,6 +10,7 @@ class PrefUtils {
 
   static const TOKEN = "token";
   static const CAT_ID = "CAT_ID";
+  static const USERDATA = "USERDATA";
   static const CART = "CART";
 
   static initInstance() async {
@@ -21,6 +23,18 @@ class PrefUtils {
 
   static String getToken() {
     return _prefs!.getString(TOKEN) ?? "";
+  }
+  
+  static Future<bool> setUserData(RegisterResponseModel userData) {
+    return _prefs!.setString(USERDATA, jsonEncode(userData.toJson()));
+  }
+
+  static RegisterResponseModel? getUserData() {
+    if (_prefs?.getString(USERDATA) == null) {
+      return null;
+    }  else{
+      return RegisterResponseModel.fromJson(jsonDecode(_prefs?.getString(USERDATA)??""));
+    }
   }
 
   static Future<bool> setActCat(int cat_id) {
@@ -46,4 +60,10 @@ class PrefUtils {
     var result = await _prefs!.setString(CART, jsonEncode(cartList.map((e) => e.toJson()).toList()));
     return result;
   }
+
+  static void clearAll() async {
+    final pref = await SharedPreferences.getInstance();
+    await pref.clear();
+  }
+
 }

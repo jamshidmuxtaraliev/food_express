@@ -73,4 +73,20 @@ class MainProvider with ChangeNotifier {
     return _foodsByCategory = products.where((element) => (element.category_id == _activeCat)).toList();
     notifyListeners();
   }
+
+  bool _resetPasword = true;
+  bool get rePasScreen => _resetPasword;
+
+  bool _updateProfile = true;
+  bool get updtScreen => _updateProfile;
+
+  void resetPaswordScreen(bool value){
+    _resetPasword = value;
+    notifyListeners();
+  }
+
+  void updateScreen(bool value){
+    _updateProfile = value;
+    notifyListeners();
+  }
 }

@@ -4,6 +4,7 @@ import 'package:food_express/models/restuarant_model.dart';
 import 'package:food_express/utils/pref_utils.dart';
 import 'package:stacked/stacked.dart';
 import '../models/offer_model.dart';
+import '../models/response/register_response_model.dart';
 
 class MainViewModel extends BaseViewModel {
   final api = ApiServices();
@@ -20,11 +21,29 @@ class MainViewModel extends BaseViewModel {
     return _makeRatingData.stream;
   }
 
+  StreamController<RegisterResponseModel> _rePasswordStream = StreamController();
+
+  Stream<RegisterResponseModel> get rePasswordData {
+    return _rePasswordStream.stream;
+  }
+
   List<OfferModel> offerList = [];
   List<OfferModel> categoryList = [];
   List<RestuarantModel> nearRestuarants = [];
   List<RestuarantModel> topRestuarants = [];
   OfferModel? oneOffer;
+
+  void resetPassword(String old_password, String new_password, int sms_code)async{
+    isProgress = true;
+    notifyListeners();
+    final data = await api.resetPassword(old_password, new_password, sms_code, _errorStream);
+    isProgress = false;
+    notifyListeners();
+    if (data != null) {
+      PrefUtils.setToken(data.token);
+      _rePasswordStream.sink.add(data);
+    }
+  }
 
   void getOffers() async {
     isProgress = true;

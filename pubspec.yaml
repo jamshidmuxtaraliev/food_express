@@ -38,7 +38,7 @@ dependencies:
   event_bus:
   geolocator:
   geocoding:
-  location:
+  location: ^5.0.0
   alice:
   cached_network_image:
   provider:
