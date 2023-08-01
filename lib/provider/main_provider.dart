@@ -74,10 +74,10 @@ class MainProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  bool _resetPasword = true;
+  bool _resetPasword = false;
   bool get rePasScreen => _resetPasword;
 
-  bool _updateProfile = true;
+  bool _updateProfile = false;
   bool get updtScreen => _updateProfile;
 
   void resetPaswordScreen(bool value){

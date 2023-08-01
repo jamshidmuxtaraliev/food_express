@@ -4,13 +4,16 @@ import 'package:food_express/provider/main_provider.dart';
 import 'package:food_express/screen/splash/splash_page.dart';
 import 'package:food_express/utils/app_colors.dart';
 import 'package:food_express/utils/pref_utils.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/otp_field_style.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
 import 'package:stacked/stacked.dart';
-
+import 'dart:ffi';
+import 'dart:io';
 import '../../../generated/assets.dart';
 import '../../../utils/utils.dart';
 import '../../../view/custom_clipper.dart';
@@ -23,19 +26,109 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  double height = 180;
+  TextEditingController phoneController =
+  TextEditingController(text: PrefUtils
+      .getUserData()
+      ?.phone ?? "+998");
+  TextEditingController nameController =
+  TextEditingController(text: PrefUtils
+      .getUserData()
+      ?.fullname ?? "Unknown User");
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController rePasswordController = TextEditingController();
+  var phoneFormatter = MaskTextInputFormatter(mask: '+998 (##) ### ## ##');
+  OtpFieldController otpbox = OtpFieldController();
+  var smsCode = "";
+
+  String imageFile = "";
+
+  Future<void> _showChoiceDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+              "Choose option",
+              style: TextStyle(color: Colors.blue),
+            ),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: [
+                  const Divider(
+                    height: 1,
+                    color: Colors.blue,
+                  ),
+                  ListTile(
+                    onTap: () {
+                      _openGallery(context);
+                    },
+                    title: const Text("Gallery"),
+                    leading: const Icon(
+                      Icons.account_box,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const Divider(
+                    height: 1,
+                    color: Colors.blue,
+                  ),
+                  ListTile(
+                    onTap: () {
+                      _openCamera(context);
+                    },
+                    title: Text("Camera"),
+                    leading: const Icon(
+                      Icons.camera,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  void _openGallery(BuildContext context) async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    if (pickedFile != null) {
+      var croppedImage = await ImageCropper().cropImage(
+          sourcePath: pickedFile.path,
+          compressQuality: 60,
+          aspectRatioPresets: [CropAspectRatioPreset.square]
+      );
+      if (croppedImage != null) {
+        setState(() {
+          imageFile = croppedImage.path;
+        });
+      }
+    }
+    Navigator.pop(context);
+  }
+
+  void _openCamera(BuildContext context) async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
+    if (pickedFile != null) {
+      var croppedImage = await ImageCropper().cropImage(
+          sourcePath: pickedFile.path,
+          compressQuality: 60,
+          aspectRatioPresets: [CropAspectRatioPreset.square]);
+      if (croppedImage!=null) {
+        setState(() {
+          imageFile = croppedImage.path;
+        });
+      }
+    }
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    double height = 180;
-    TextEditingController phoneController =
-        TextEditingController(text: PrefUtils.getUserData()?.phone ?? "+998");
-    TextEditingController nameController =
-        TextEditingController(text: PrefUtils.getUserData()?.fullname ?? "Unknown User");
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController rePasswordController = TextEditingController();
-    var phoneFormatter = MaskTextInputFormatter(mask: '+998 (##) ### ## ##');
-    OtpFieldController otpbox = OtpFieldController();
-    var smsCode = "";
-
     return Consumer<MainProvider>(
       builder: (context, provider, child) {
         return Scaffold(
@@ -62,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: Text(
                                     "Profile",
                                     style:
-                                        TextStyle(color: AppColors.WHITE, fontFamily: "bold", fontSize: 28),
+                                    TextStyle(color: AppColors.WHITE, fontFamily: "bold", fontSize: 28),
                                   )),
                             ),
                           ),
@@ -72,20 +165,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               right: 0,
                               child: Container(
                                 alignment: Alignment.center,
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  height: 90,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF323232),
-                                      border: Border.all(width: 1, color: AppColors.TEXTFILED_COLOR),
-                                      borderRadius: BorderRadius.all(Radius.circular(18))),
-                                  child: Image.asset(
-                                    Assets.imagesProfile,
-                                    color: Colors.white,
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.all(8),
+                                      alignment: Alignment.center,
+                                      height: 90,
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                          color: const Color(0xFF323232),
+                                          border: Border.all(width: 1, color: AppColors.TEXTFILED_COLOR),
+                                          borderRadius: const BorderRadius.all(Radius.circular(18))),
+                                      child: (imageFile == "")
+                                          ? Image.asset(
+                                        Assets.imagesProfile,
+                                        color: Colors.white,
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      )
+                                          : Image.file(
+                                        File(imageFile),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: InkWell(
+                                          onTap: () {
+                                            _showChoiceDialog(context);
+                                          },
+                                          child: CircleAvatar(
+                                            radius: 16,
+                                            backgroundColor: AppColors.ACCENT_AS,
+                                            child: const Icon(
+                                              Icons.add,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ))
+                                  ],
                                 ),
                               ))
                         ],
@@ -98,9 +218,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Container(
                                 margin: const EdgeInsets.only(top: 12, bottom: 16),
                                 alignment: Alignment.center,
-                                child: const Text(
-                                  "FIO",
+                                child: Text(
+                                  PrefUtils
+                                      .getUserData()
+                                      ?.fullname ?? "FIO",
                                   style: TextStyle(color: Colors.white, fontSize: 24),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 )),
                             if (provider.rePasScreen != true)
                               customTextField(
@@ -130,9 +254,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Container(
                                       height: 45,
                                       margin: const EdgeInsets.only(top: 16),
-                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
                                       decoration: BoxDecoration(
-                                          gradient: buttonGradiet(), borderRadius: BorderRadius.circular(12)),
+                                          border: Border.all(width: 1, color: AppColors.TEXTFILED_COLOR),
+                                          borderRadius: BorderRadius.circular(12)),
                                       child: const Center(
                                         child: Text(
                                           "Update Profile",
@@ -168,24 +293,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(builder: (context) => SplashPage()),
-                                          (route) => false);
+                                              (route) => false);
                                     },
                                     child: Container(
                                       height: 45,
                                       margin: const EdgeInsets.only(top: 16, bottom: 16),
-                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
                                       decoration: BoxDecoration(
-                                          border: Border.all(width: 1, color: AppColors.TEXTFILED_COLOR),
-                                          borderRadius: BorderRadius.circular(12)),
+                                          gradient: buttonGradiet(), borderRadius: BorderRadius.circular(12)),
                                       child: Center(
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Icon(
                                               Icons.logout,
-                                              color: AppColors.ICON_COLOR,
+                                              color: AppColors.WHITE,
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 12,
                                             ),
                                             const Text(
@@ -223,7 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   const Text(
                                     "Confirm with an SMS code",
                                     style:
-                                        TextStyle(color: Colors.white, fontSize: 20, fontFamily: "regular"),
+                                    TextStyle(color: Colors.white, fontSize: 20, fontFamily: "regular"),
                                   ),
                                   const SizedBox(
                                     height: 8,
@@ -231,7 +355,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   OTPTextField(
                                     controller: otpbox,
                                     length: 4,
-                                    width: MediaQuery.of(context).size.width,
+                                    width: MediaQuery
+                                        .of(context)
+                                        .size
+                                        .width,
                                     fieldWidth: 44,
                                     style: const TextStyle(color: Colors.white, fontSize: 17),
                                     textFieldAlignment: MainAxisAlignment.start,
@@ -242,12 +369,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         disabledBorderColor: AppColors.TEXTFILED_COLOR,
                                         enabledBorderColor: AppColors.TEXTFILED_COLOR,
                                         focusBorderColor: AppColors.ICON_COLOR),
-                                    onChanged: (pin){
+                                    onChanged: (pin) {
                                       smsCode = pin;
                                     },
                                     onCompleted: (pin) {
                                       smsCode = pin;
-                                      },
+                                    },
                                   ),
                                   // SizedBox(height: 8,),
                                 ],
@@ -261,8 +388,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         passwordController.clear();
                                         rePasswordController.clear();
                                         nameController.text =
-                                            PrefUtils.getUserData()?.fullname ?? "Unknown User";
-                                        phoneController.text = PrefUtils.getUserData()?.phone ?? "+998";
+                                            PrefUtils
+                                                .getUserData()
+                                                ?.fullname ?? "Unknown User";
+                                        phoneController.text = PrefUtils
+                                            .getUserData()
+                                            ?.phone ?? "+998";
                                         provider.resetPaswordScreen(false);
                                         provider.updateScreen(false);
                                       },
@@ -288,7 +419,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         if (provider.rePasScreen) {
                                           if (passwordController.text == "" ||
                                               rePasswordController.text == "" ||
-                                              smsCode=="") {
+                                              smsCode == "") {
                                             showError(context, "Kerakli maydonlarni to'ldiring");
                                           } else {
                                             viewModel.resetPassword(passwordController.text,
@@ -356,8 +487,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 onTap: () {
                                   passwordController.clear();
                                   rePasswordController.clear();
-                                  nameController.text = PrefUtils.getUserData()?.fullname ?? "Unknown User";
-                                  phoneController.text = PrefUtils.getUserData()?.phone ?? "+998";
+                                  nameController.text = PrefUtils
+                                      .getUserData()
+                                      ?.fullname ?? "Unknown User";
+                                  phoneController.text = PrefUtils
+                                      .getUserData()
+                                      ?.phone ?? "+998";
                                   provider.resetPaswordScreen(false);
                                   provider.updateScreen(false);
                                   Navigator.pop(context);
@@ -372,7 +507,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Text(
                                       "Update Profile",
                                       style:
-                                          TextStyle(color: Colors.white, fontSize: 20, fontFamily: "medium"),
+                                      TextStyle(color: Colors.white, fontSize: 20, fontFamily: "medium"),
                                     ),
                                   ),
                                 ),

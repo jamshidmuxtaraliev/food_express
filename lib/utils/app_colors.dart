@@ -13,5 +13,10 @@ class AppColors {
   static Color TEXT_COLOR = Color(0xFFB8B8B8);
   static Color ERROR_COLOR = Color(0xFFEC3535);
   static Color WHITE = Color(0xFFFFFFFF);
+ static Color YELLOW_LIGHT = const Color(0xFFCAFF37);
+ static Color COLOR_NEORPH = Color(0xFF0DF5E4);
+ static Color ACCENT_AS = Color.fromRGBO(152, 159, 213, 1);
+
+
 
 }
